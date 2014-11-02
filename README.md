@@ -7,10 +7,11 @@ to learn more about our 2014 project, Staphylocide.
 
 This software was mostly created by the mathemtatical modelling team, headed by Jama Hagi-Yusuf.
 
-*  /CRISPRi contains MATLAB models written that describe CRISPR interference, including some
+*  **/CRISPRi** contains MATLAB models written that describe CRISPR interference, including some
 parameter estimation and sensitivity analysis. Learn more about our CRISPRi model
 [on the wiki](http://2014.igem.org/Team:Waterloo/Math_Book/CRISPRi).
-*  /Software-CRISPRecise contains the beginnings of a software project to help choose targets for
+*  **/Conjugation** contains our PDE and Agent Based models for conjugation
+*  **/RNAi** contains MATLAB models that describe silencing RNA, including sensitivity analysis. Read
+   more about our RNAi model [on the wiki](http://2014.igem.org/Team:Waterloo/Math_Book/sRNA).
+*  **/Software-CRISPRecise** contains the beginnings of a software project to help choose targets for
   CRISPR interference, which is unfinished but will likely be continued next year.
-*  /sRNA contains MATLAB models that describe silencing RNA, including sensitivity analysis. Read
-   more about our sRNA model [on the wiki](http://2014.igem.org/Team:Waterloo/Math_Book/sRNA).
