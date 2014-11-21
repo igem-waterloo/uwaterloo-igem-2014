@@ -8,7 +8,7 @@ function steadystate = RNAi_Model
 
 
 	% Species
-    titles = {'sRNA'; 'mRNA'; 'YFP'; 'Hfq-mRNA'; 'Hfq'; 'Hfq-sRNA Complex'; 'Hfq-mRNA-sRNA Complex'};
+    titles = {'sRNA'; 'mRNA'; 'YFP'; 'Hfq-mRNA'; 'Hfq'; 'Hfq-sRNA Complex'; 'Hfq-mRNA-sRNA Complex'; 'mRNA-sRNA'};
 	nEqns = 7;
     
 	% Initial Conditions
@@ -70,7 +70,7 @@ function steadystate = RNAi_Model
 	% ODE Solver and Plots
     RNAiODE=@RNAi_DE_System;
     options=odeset('Refine', 6);
-	Tend = 24*60*60*10000; % Time
+	Tend = 24*60*60*1; % Time
     
     % Run simulation
     [t,R] = ode23s(RNAiODE, [0, Tend], R0, options, parameters);     
@@ -88,5 +88,5 @@ function steadystate = RNAi_Model
     % Local Sensitivity Analysis 
     RNAiRelSensitivity = ...
          LocalSensitivityAnalysis( RNAiODE, @RNAi_System_YFP_Output, ...
-         parameters, R0, 0.01, 23 );
+         parameters, R0, 0.01, 23 )
 end
