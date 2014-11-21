@@ -33,16 +33,16 @@ n = 100
 seed = 5
 standard_run_time = 24.0 # typical simulation time in h
 
-# cody: 0.5 h for staph, 0.25 h for e.coli
+# cody: 0.5 h for staph, 0.25 h for e.coli (back to 0.5h ecoli -oct 17)
 div_time_staph = 0.5
-div_time_ecoli = 0.25
+div_time_ecoli = 0.5
 expected_receiver_div_time = div_time_ecoli # avg time for 1 R cell to divide in h 
 expected_donor_div_time = div_time_ecoli # avg time for 1 D cell to divide in h
 
 # cody: staph rate could be 10^4 i.e. 10^-4
 conj_super_rate = 1.0
-conj_ecoli_rate = 10.0 
-conj_staph_rate = 10**4.0 
+conj_ecoli_rate = 10.0
+conj_staph_rate = 10**4.0
 expected_conj_time = conj_ecoli_rate # avg time for 1 cell to conjugate in h (Jama: 10h for e.coli, more for staph)
 
 death_rate_lab = 0.0 # for now
@@ -50,6 +50,9 @@ death_rate_body = 4.0 # average h for 1 cell to die to immune (?) cells (NOT IMP
 
 turn_rate = 2.0 # average turns between each division; simulation step size
 time_per_turn = expected_receiver_div_time / turn_rate
+
+times_antibiotic = [] # antibiotic introduction time in h
+turns_antibiotic = [x/time_per_turn for x in times_antibiotic]
 
 
 # Classes
@@ -146,7 +149,8 @@ class Receiver(Cell):
     def __init__(self, location):
         Cell.__init__(self,'R',location)
         self.pause = 0 # 0 if cell is active, non-zero means turns until active
-        self.refractory_div = expected_donor_div_time/4/time_per_turn # refractory period after division in turns        
+        self.refractory_div = expected_donor_div_time/4/time_per_turn # refractory period after division in turns
+        self.resistance_factor = 1 # resistance to antibiotics
 
 class Donor(Cell):
 
@@ -155,8 +159,9 @@ class Donor(Cell):
         self.pause = 0 # 0 if cell is active, non-zero means turns until active
         self.maturity = 0 # starting probability of conjugation
         self.maxmaturity = 50 # max probability of conjugation
-        self.refractory_conj = expected_conj_time/16/time_per_turn # refractory period after conjugation in turns
-        self.refractory_div = expected_donor_div_time/4/time_per_turn # refractory period after division in turns
+        self.refractory_conj = ceil(0.25/time_per_turn) #OLD VERSION: expected_conj_time/16/time_per_turn # refractory period after conjugation in turns
+        self.refractory_div = ceil(0.50/time_per_turn) #OLD VERSION: expected_donor_div_time/4/time_per_turn # refractory period after division in turns
+        self.resistance_factor = 1; # resistance to antibiotics
 
 # Initiate Cell Grid and Data Directory
 # =================================================
@@ -235,11 +240,47 @@ def count_cells(): # returns a list of current cell counts: [# of empty, # of re
                 D += 1
             else:
                 E += 1
-    return [E,R,D] 
+    return [E,R,D]
+
+def antibiotic(): # introduces antibiotic and kills donor cells
+    for i in xrange(n):
+        for j in xrange(n):
+            loc = [i, j]
+            if is_donor(loc):
+                grid[i][j] = Empty(loc)
+    return
+
+def new_donor_round(): # introduce new round of donor cells
+    for i in xrange(n):
+        for j in xrange(n):
+            loc = [i, j]
+            if is_empty(loc):
+                distr = randint(1, 1001)
+                if distr <= 500: # place donors in 50% of empty cells
+                    grid[i][j] = Donor(loc)
+    return
         
 def run_sim(T): # T = total sim time
     turns = int(ceil(T/time_per_turn))
+    antibiotic_introduced = 0 # flag for catcing when antibiotics are introduced
     for t in xrange(turns):
+        if antibiotic_introduced:
+            print 'Turn ', t, ' : Time Elapsed ', t*time_per_turn, "h (New Round)"
+            new_donor_round()
+            antibiotic_introduced = 0
+            [E,R,D] = count_cells()
+            grid_data.append([t, t*time_per_turn, E, R, D])
+            hex_plotter(grid, t*time_per_turn, n, plot_hex_folder)
+            continue
+        if t in turns_antibiotic: # introduce antibiotics at turn 160 (20 h)
+            print 'Turn ', t, ' : Time Elapsed ', t*time_per_turn, "h (Antibiotics Introduced)"
+            antibiotic()
+            antibiotic_introduced = 1
+            [E,R,D] = count_cells()
+            grid_data.append([t, t*time_per_turn, E, R, D])
+            hex_plotter(grid, t*time_per_turn, n, plot_hex_folder)
+            continue
+
         print 'Turn ', t, ' : Time Elapsed ', t*time_per_turn, "h"
         #printer()
         for i in xrange(n):
@@ -297,11 +338,13 @@ def run_sim(T): # T = total sim time
                 else:
                     raise Exception("Not _, R, or D")
                     break
+
         [E,R,D] = count_cells()
         grid_data.append([t, t*time_per_turn, E, R, D])
         #print grid_data, "\n"
         hex_plotter(grid, t*time_per_turn, n, plot_hex_folder)
         #raw_input()
+            
 
     return grid_data
 
