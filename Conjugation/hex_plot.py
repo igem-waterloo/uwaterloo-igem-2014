@@ -19,6 +19,7 @@ axis_tick_length = int(axis_length + axis_buffer)
 label_colour_dict = {'R': "red",
                      'D': "cyan",#"green",
                      '_': "white"} # or nofill
+hex_flag = False # True if you want actual hexagons instead of circles
 
 # FUNCTIONS
 
@@ -37,10 +38,14 @@ def hex_grid_draw(grid, n):
         for j in xrange(n):
             cell_label = grid[i][j].label
             hex_colour = label_colour_dict[cell_label]
-            hex_ij = mpatches.RegularPolygon((x,y), numVertices=6, radius = hex_radius, facecolor=hex_colour, ec="k")
+            if hex_flag:
+                hex_ij = mpatches.RegularPolygon((x,y), numVertices=6, radius=hex_radius, facecolor=hex_colour, ec="k")
+                plt.gca().add_patch(hex_ij)
+            else:
+                hex_ij = plt.Circle((x,y), radius=hex_radius, color=hex_colour, ec="k")
+                plt.gca().add_artist(hex_ij)
             x = x + dx
-            plt.gca().add_patch(hex_ij)
-
+                
         y = y - dy
         x = x0 + ((i+1)%2)*hex_radius # shift odd rows to the right a bit
 
@@ -54,7 +59,7 @@ def hex_plotter(grid, time, n, hex_plot_dir):
     plt.xticks(axis_ticks)
     plt.yticks(axis_ticks)
     plt.axis('off')
-    plt.savefig(hex_plot_dir + 'grid_at_time_%f.jpg' % time)
+    plt.savefig(hex_plot_dir + 'grid_at_time_%f.png' % time, bbox_inches='tight')
     plt.clf()
     return
 
