@@ -9,7 +9,7 @@ function steadystate = RNAi_Model
 
 	% Species
     titles = {'sRNA'; 'mRNA'; 'YFP'; 'Hfq-mRNA'; 'Hfq'; 'Hfq-sRNA Complex'; 'Hfq-mRNA-sRNA Complex'; 'mRNA-sRNA'};
-	nEqns = 7;
+	nEqns = 8;
     
 	% Initial Conditions
     % ** Note: These were obtained from running a simulation to steady
