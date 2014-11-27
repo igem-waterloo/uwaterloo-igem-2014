@@ -20,6 +20,8 @@ function dS = RNAi_DE_System( ~, S, p )
     k_3 = p(14);
     k_4 = p(15);
     beta_ms = p(16);
+    beta_Hs = p(17);
+    beta_Hms = p(18);
 
     % Differential terms from elements of R vector
     s = S(1);   % sRNA
@@ -42,8 +44,8 @@ function dS = RNAi_DE_System( ~, S, p )
     d_M =  alpha_M*m       -beta_M*M;
     d_h =  alpha_h         -beta_h*h;
     d_H =  alpha_H*h       -beta_H*H       -k_1*H*s +k_m1*Hs  +k_3*Hms;
-    d_Hs =                 -beta_H*Hs      +k_1*H*s -k_m1*Hs  -k_2*Hs*m;
-    d_Hms=                 -beta_H*Hms                        +k_2*Hs*m -k_3*Hms;
+    d_Hs =                 -beta_Hs*Hs      +k_1*H*s -k_m1*Hs  -k_2*Hs*m;
+    d_Hms=                 -beta_Hms*Hms                        +k_2*Hs*m -k_3*Hms;
     d_ms = k_4*m*s         -beta_ms*ms                        +k_3*Hms;
     
 	dS=[d_s; d_m; d_M; d_h; d_H; d_Hs; d_Hms; d_ms]; 

@@ -33,17 +33,19 @@ function steadystate = RNAi_Model
     beta_h = 0.00231049060; % nM/s
     alpha_H = 0.0057/60; % translation molec/s
     beta_H = 6.42*10^(-5);  % degradation not provided?
+    beta_Hs = 6.42*10^(-5);  % degradation not provided?
+    beta_Hms = 6.42*10^(-5);  % degradation not provided?
     alpha_s = 0.0011/60; % nM/s
     beta_s = 0.002310490602; % nM/s
     alpha_m = 0.0011/60; % nM/s
     beta_m = 0.002310490602;
     alpha_M = 0.0057/60;
     beta_M = 6.42*10^(-5);
-    k_1 = 10^(6);
+    k_1 = 10^(-3);
     k_m1 = 0.7*10^(-4); % the backward rate from Hfq-sRNA association was taken 
     %             (previously) to be zero. Hence this parameter didn't
     %             exist.
-    k_2 = 3.5*10^(6);
+    k_2 = 3.5*10^(-3);
 
     % degradosome is taken to be mass action
     % ** NOTE: This is where the major difference is.
@@ -65,7 +67,7 @@ function steadystate = RNAi_Model
     % Place all parameters in a vector
     parameters = [alpha_h beta_h alpha_H beta_H ...
                   alpha_s beta_s alpha_m beta_m alpha_M beta_M ...
-                  k_1 k_m1 k_2 k_m3 k_4 beta_ms];
+                  k_1 k_m1 k_2 k_m3 k_4 beta_ms beta_Hs beta_Hms];
     
 	% ODE Solver and Plots
     RNAiODE=@RNAi_DE_System;
