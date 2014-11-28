@@ -41,7 +41,7 @@ function steadystate = RNAi_Model
     beta_m = 2.31*10^(-3);      %* s^-1
     alpha_M = 1/600;            %* s^-1
     beta_M = 6.42*10^(-5);      % s^-1
-    k_1 = 10^(6);               % (nM*s)^-1
+    k_1 = 10^(-3);              % (nM*s)^-1
     k_m1 = 0.7*10^(-4);         % s^-1 (the backward rate from Hfq-sRNA association was taken)
     %             (previously) to be zero. Hence this parameter didn't
     %             exist.
