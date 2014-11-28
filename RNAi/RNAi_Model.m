@@ -8,8 +8,8 @@ function steadystate = RNAi_Model
 
 
 	% Species
-    titles = {'sRNA'; 'mRNA'; 'YFP'; 'Hfq-mRNA'; 'Hfq'; 'Hfq-sRNA Complex'; 'Hfq-mRNA-sRNA Complex'};
-	nEqns = 7;
+    titles = {'sRNA'; 'mRNA'; 'YFP'; 'Hfq-mRNA'; 'Hfq'; 'Hfq-sRNA Complex'; 'Hfq-mRNA-sRNA Complex'; 'mRNA-sRNA'};
+	nEqns = 8;
     
 	% Initial Conditions
     % ** Note: These were obtained from running a simulation to steady
@@ -29,21 +29,23 @@ function steadystate = RNAi_Model
     % * rate of productions - alpha
     % * rate of degradation - beta
 	% * lowercase means RNA, uppercase mean protien product
-    alpha_h = 0.0011/60; % nM/s
-    beta_h = 0.00231049060; % nM/s
-    alpha_H = 0.0057/60; % translation molec/s
-    beta_H = 6.42*10^(-5);  % degradation not provided?
-    alpha_s = 0.0011/60; % nM/s
-    beta_s = 0.002310490602; % nM/s
-    alpha_m = 0.0011/60; % nM/s
-    beta_m = 0.002310490602;
-    alpha_M = 0.0057/60;
-    beta_M = 6.42*10^(-5);
-    k_1 = 10^(6);
-    k_m1 = 0.7*10^(-4); % the backward rate from Hfq-sRNA association was taken 
+    alpha_h = 1/600;            %* nM/s
+    beta_h = 2.31*10^(-3);      % s^-1
+    alpha_H = 0.9;              % s^-1
+    beta_H = 6.42*10^(-5);      % s^-1 (degradation not provided?)
+    beta_Hs = 6.42*10^(-5);     % s^-1 (degradation not provided?)
+    beta_Hms = 6.42*10^(-5);    % s^-1 (degradation not provided?)
+    alpha_s = 1/600;            %* nM/s
+    beta_s = 2.31*10^(-3);      %* nM/s
+    alpha_m = 1/600;            %* nM/s
+    beta_m = 2.31*10^(-3);      %* s^-1
+    alpha_M = 1/600;            %* s^-1
+    beta_M = 6.42*10^(-5);      % s^-1
+    k_1 = 10^(6);               % (nM*s)^-1
+    k_m1 = 0.7*10^(-4);         % s^-1 (the backward rate from Hfq-sRNA association was taken)
     %             (previously) to be zero. Hence this parameter didn't
     %             exist.
-    k_2 = 3.5*10^(6);
+    k_2 = 3.5*10^(-3);          % (nM*s)^-1
 
     % degradosome is taken to be mass action
     % ** NOTE: This is where the major difference is.
@@ -56,21 +58,21 @@ function steadystate = RNAi_Model
     %          sure what to do here.
     %    TL;DR: This should be mass action, and not Michaelis-Menton. This
     %           is where the confusion was.
-    k_m3 = k_m1;
+    k_m3 = 0.7*10^(-4);         % s^-1
     
     % New terms take into account binding of sRNA to mRNA w/o Hfq
-    k_4 = k_2/10;
-    beta_ms = 10*beta_h;
+    k_4 = k_2/10;               % (nM*s)^-1 (no value on wiki)
+    beta_ms = 2.31*10^(-2);     % s^-1
    
     % Place all parameters in a vector
     parameters = [alpha_h beta_h alpha_H beta_H ...
                   alpha_s beta_s alpha_m beta_m alpha_M beta_M ...
-                  k_1 k_m1 k_2 k_m3 k_4 beta_ms];
+                  k_1 k_m1 k_2 k_m3 k_4 beta_ms beta_Hs beta_Hms];
     
 	% ODE Solver and Plots
     RNAiODE=@RNAi_DE_System;
     options=odeset('Refine', 6);
-	Tend = 24*60*60*10000; % Time
+	Tend = 24*60*60*1; % Time
     
     % Run simulation
     [t,R] = ode23s(RNAiODE, [0, Tend], R0, options, parameters);    
@@ -97,5 +99,5 @@ function steadystate = RNAi_Model
     % Local Sensitivity Analysis 
     RNAiRelSensitivity = ...
          LocalSensitivityAnalysis( RNAiODE, @RNAi_System_YFP_Output, ...
-         parameters, R0, 0.01, 23 );
+         parameters, R0, 0.01, 23 )
 end
