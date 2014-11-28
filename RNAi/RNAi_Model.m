@@ -58,7 +58,7 @@ function steadystate = RNAi_Model
     %          sure what to do here.
     %    TL;DR: This should be mass action, and not Michaelis-Menton. This
     %           is where the confusion was.
-    k_m3 = 0.7*10^(-4);         % s^-1
+    k_3 = 0.7*10^(-4);         % s^-1
     
     % New terms take into account binding of sRNA to mRNA w/o Hfq
     k_4 = k_2/10;               % (nM*s)^-1 (no value on wiki)
@@ -67,7 +67,7 @@ function steadystate = RNAi_Model
     % Place all parameters in a vector
     parameters = [alpha_h beta_h alpha_H beta_H ...
                   alpha_s beta_s alpha_m beta_m alpha_M beta_M ...
-                  k_1 k_m1 k_2 k_m3 k_4 beta_ms beta_Hs beta_Hms];
+                  k_1 k_m1 k_2 k_3 k_4 beta_ms beta_Hs beta_Hms];
     
 	% ODE Solver and Plots
     RNAiODE=@RNAi_DE_System;
@@ -81,7 +81,7 @@ function steadystate = RNAi_Model
         subplot(2, 4, i);
         plot(t/3600, R(:,i), 'LineWidth', 2);
         title(titles(i));
-        axis tight
+        %axis tight
     end
     parameters(5) = 0; % Set alpha_S to zero = No sRNA activity
     [t,R] = ode23s(RNAiODE, [0, Tend], R0, options, parameters); 
