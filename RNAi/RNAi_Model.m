@@ -72,7 +72,7 @@ function steadystate = RNAi_Model
 	% ODE Solver and Plots
     RNAiODE=@RNAi_DE_System;
     options=odeset('Refine', 6);
-	Tend = 24*60*60*1; % Time
+	Tend = 100*60*60*1; % Time
     
     % Run simulation
     [t,R] = ode23s(RNAiODE, [0, Tend], R0, options, parameters);    
