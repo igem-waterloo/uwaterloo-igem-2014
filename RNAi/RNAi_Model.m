@@ -92,6 +92,8 @@ function steadystate = RNAi_Model
         title(titles(i));
         axis tight
     end
+    parameters(5) = alpha_s; % Set alpha_S to zero = No sRNA activity
+
 
     format long
     steadystate=R(end,:);
