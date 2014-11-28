@@ -75,11 +75,11 @@ function steadystate = RNAi_Model
 	Tend = 100*60*60*1; % Time
     
     % Run simulation
-    [t,R] = ode23s(RNAiODE, [0, Tend], R0, options, parameters);    
+    [t,R_noSRNA] = ode23s(RNAiODE, [0, Tend], R0, options, parameters);    
 	figure(1);
     for i = 1:length(titles)
         subplot(2, 4, i);
-        plot(t/3600, R(:,i), 'LineWidth', 2);
+        plot(t/3600, R_noSRNA(:,i), 'LineWidth', 2);
         title(titles(i));
         %axis tight
     end
@@ -90,7 +90,7 @@ function steadystate = RNAi_Model
         subplot(2, 4, i);
         plot(t/3600, R(:,i), 'LineWidth', 2);
         title(titles(i));
-        axis tight
+        %axis tight
     end
     parameters(5) = alpha_s; % Set alpha_S to zero = No sRNA activity
 
