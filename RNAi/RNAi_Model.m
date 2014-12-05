@@ -71,11 +71,12 @@ function steadystate = RNAi_Model
     
 	% ODE Solver and Plots
     RNAiODE=@RNAi_DE_System;
-    options=odeset('Refine', 6);
-	Tend = 100*60*60*1; % Time
+    options=odeset( 'Refine', 6, 'NonNegative', cumsum(ones(size(R0))) );
+	Tend = 24*60*60*2; % Time
     
     % Run simulation
-    [t,R_noSRNA] = ode23s(RNAiODE, [0, Tend], R0, options, parameters);    
+    parameters(5) = 0; % No sRNA Activity
+    [t,R_noSRNA] = ode15s(RNAiODE, [0, Tend], R0, options, parameters);    
 	figure(1);
     for i = 1:length(titles)
         subplot(2, 4, i);
@@ -83,8 +84,9 @@ function steadystate = RNAi_Model
         title(titles(i));
         %axis tight
     end
-    parameters(5) = 0; % Set alpha_S to zero = No sRNA activity
-    [t,R] = ode23s(RNAiODE, [0, Tend], R0, options, parameters); 
+
+    parameters(5) = alpha_s; % Set activitiy to normal
+    [t,R] = ode15s(RNAiODE, [0, Tend], R0, options, parameters); 
     figure(2);
     for i = 1:length(titles)
         subplot(2, 4, i);
@@ -92,7 +94,6 @@ function steadystate = RNAi_Model
         title(titles(i));
         %axis tight
     end
-    parameters(5) = alpha_s; % Set alpha_S to zero = No sRNA activity
 
 
     format long
@@ -101,5 +102,5 @@ function steadystate = RNAi_Model
     % Local Sensitivity Analysis 
     RNAiRelSensitivity = ...
          LocalSensitivityAnalysis( RNAiODE, @RNAi_System_YFP_Output, ...
-         parameters, R0, 0.01, 23 )
+         parameters, R0, 1/100, @ode15s, options )
 end

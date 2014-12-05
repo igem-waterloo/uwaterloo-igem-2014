@@ -1,6 +1,6 @@
 function ParameterRelSensitivity = ...
     LocalSensitivityAnalysis( DESystem, System_YFP_Output, Parameters, Y0,...
-    Tol, odeType)
+    Tol, odeSolver, options)
 % LocalSensitivityAnalysus  Estimate Relative Local Sensitivity of DESystem
 % to Parameters
 %
@@ -23,8 +23,7 @@ function ParameterRelSensitivity = ...
 %                       Percent by which we vary each parameter before
 %                       measuring sensitivity (default: 0.01).
 %       odeType
-%                       If 23, the DESystem will be run with ode23s. If 45
-%                       or not given, uses ode45.
+%                       If not given, uses ode45.
 %   Returns:
 %       ParameterRelSensitivity
 %                       A vector associating a parameter (index) to 
@@ -36,34 +35,27 @@ function ParameterRelSensitivity = ...
         Tol = 0.01;
     end
     if nargin < 6
-        odeType = 45;
+        odeSolver = @ode45;
+    end
+    if nargin < 7
+        options = odeset();
     end
 
-    DE = @(T,S) DESystem(T, S, Parameters);
-    T = [0 ; 24*60*60*10];
+    T = [0 ; 24*60*60*2];
     
-    if odeType == 23 % for RNAi
-        [~, Y1] = ode23s( DE, T, Y0 );
-    elseif odeType == 45 % for CRISPRi
-        [~, Y1] = ode45( DE, T, Y0 );
-    end
+    [~,Y1] = odeSolver( DESystem, T, Y0, options, Parameters );
     YFP1 = System_YFP_Output(Y1);
     
     ParameterRelSensitivity = zeros(size(Parameters));
     for p = 1:length(Parameters)
         Z = ones(size(Parameters));
-        Z(p) = Tol + 1;
-        DE_shift = @(T,S) DESystem(T, S, Parameters .* Z);
+        Z(p) = Tol +  1;
         
         DP = Parameters(p) * Tol;
-
-        if odeType == 23 % for RNAi
-            [~, Y2] = ode23s( DE_shift, T, Y0 );
-        elseif odeType == 45 % for CRISPRi
-            [~, Y2] = ode45s( DE_shift, T, Y0 );
-        end
-
+        
+        [~,Y2] = odeSolver( DESystem, T, Y0, options, Parameters .* Z );
         YFP2 = System_YFP_Output(Y2);
+        
         ParameterRelSensitivity(p) = ...
             (( YFP2(end) - YFP1(end) ) / DP )...
             * ( Parameters(p) /  YFP1(end) );
