@@ -45,17 +45,16 @@ function ParameterRelSensitivity = ...
     
     [~,Y1] = odeSolver( DESystem, T, Y0, options, Parameters );
     YFP1 = System_YFP_Output(Y1);
-    
+
     ParameterRelSensitivity = zeros(size(Parameters));
     for p = 1:length(Parameters)
         Z = ones(size(Parameters));
         Z(p) = Tol +  1;
         
         DP = Parameters(p) * Tol;
-        
         [~,Y2] = odeSolver( DESystem, T, Y0, options, Parameters .* Z );
         YFP2 = System_YFP_Output(Y2);
-        
+       
         ParameterRelSensitivity(p) = ...
             (( YFP2(end) - YFP1(end) ) / DP )...
             * ( Parameters(p) /  YFP1(end) );
